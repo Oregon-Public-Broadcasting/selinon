@@ -75,13 +75,15 @@ class SelinonTask(metaclass=abc.ABCMeta):
         """
         return StoragePool.get_storage_by_task_name(self.task_name)
 
-    def parent_task_result(self, parent_name):
+    def parent_task_result(self, parent_name=None):
         """Retrieve parent task result.
 
         :param parent_name: name of parent task to retrieve result from
         :return: result of parent task
         """
         try:
+            if not parent_name:
+                parent_name = list(self.parent.keys())[0]
             parent_task_id = self.parent[parent_name]
         except KeyError as exc:
             raise NoParentNodeError("No such parent '%s' in task '%s' in flow '%s', check your configuration"
