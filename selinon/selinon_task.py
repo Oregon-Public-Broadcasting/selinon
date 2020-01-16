@@ -88,6 +88,9 @@ class SelinonTask(metaclass=abc.ABCMeta):
         except KeyError as exc:
             raise NoParentNodeError("No such parent '%s' in task '%s' in flow '%s', check your configuration"
                                     % (parent_name, self.task_name, self.flow_name)) from exc
+        except AttributeError as exc:
+            raise NoParentNodeError("Cannot find parents for task '%s' in flow '%s', check your configuration"
+                                    % (self.task_name, self.flow_name)) from exc
 
         return StoragePool.retrieve(self.flow_name, parent_name, parent_task_id)
 

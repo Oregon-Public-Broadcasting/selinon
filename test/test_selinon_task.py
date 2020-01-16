@@ -58,9 +58,28 @@ class TestSelinonTask(SelinonTestCase):
 
         assert task.parent_task_result(parent_task_name) == result
 
+    def test_parent_task_result_no_name(self, task, params):
+        """ Tests that parent_task_result returns the results from the first parent, if no parent name provided. """
+        parent_task_name = 'task2'
+        parent_task_id = params['parent'][parent_task_name]
+        result = 'foo'
+
+        flexmock(StoragePool)\
+            .should_receive('retrieve')\
+            .with_args(params['flow_name'], parent_task_name, parent_task_id)\
+            .and_return(result)
+
+        assert task.parent_task_result() == result
+
     def test_parent_task_result_error(self, task, params):
         with pytest.raises(NoParentNodeError):
             task.parent_task_result('some-not-existing-task')
+
+    def test_parent_task_result_no_name_no_parent(self, task, params):
+        """ Tests that parent_task_result with no name or parents raises a NoParentError. """
+        task.parent = None
+        with pytest.raises(NoParentNodeError):
+            task.parent_task_result()
 
     def test_parent_flow_result(self, task, params):
         parent_flow_name = 'flow2'
